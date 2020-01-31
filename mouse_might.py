@@ -27,7 +27,17 @@ Review of methods architecture:
     9. update_position()
     10. draw() 
 
-    There are some problems that this architecture has with respect to our end goals, however.  
+    There are some problems that this architecture has with respect to our end goals, however. Right now, the model is such that
+    multiple mice will move randomly and independently within the window. There is no structure intereaction between the mice 
+    that maps onto real mouse behavior. Next, we want to define a few modes of interaction: 
+
+    1. Aggression --> in this case, we have one agressor and one victim
+    2. Curiosity --> both mice are mutually exploring each other 
+    3. Dominance --> one mouse is asserting its dominance over the other, we therefore have one dominant and one subbordinate mouse
+
+    We also have not stored the regions of the window occupied by each mouse in each frame. This is a simple matter though. 
+    Finally, there should be a more realistic physiological modelling of the mice. Right now, mice are just circles moving 
+    in a particular manner. We want them to be at least a body and a head... 
 
 
 ''' 
