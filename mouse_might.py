@@ -1,11 +1,34 @@
 '''
 This is meant to be a model of two mice interacting in a bounded region. There are a few goals for this the progression of this project: 
-    1. Getting a point to move randomly in a bounded region
-    2. Getting a circle, whose center is a randomly moving point, to move in a bounded region
-    3. Dealing with boundary conditions --> that is, we want the circle to either bounce against the boundary
-       once it meets it  
-    4. We want to add a triangular head that attaches to the circle. Now, the center of the triangle directs the random 
-       motion of the 
+    1. Visualize two or more mice moving in a bounded region (smoothly dealing with boundary conditions) 
+    2. Realistically modelling the movement of mice, with built in randomness
+    3. Realistically modelling the interaction between two mice, again with built in randomness
+    4. Capturing information on a frame by frame basis about what area in the bounded region each mouse occupies
+
+Review of methods architecture: 
+    We have a window class and a mouse class. The window is the bounded region in which the mice move. Window has the following
+    methods: 
+
+    1. init()
+    2. create_mice()
+    3. update_mice_movement()
+    4. draw() 
+
+    And mouse has the following methods: 
+
+    1. init()
+    2. set_initial_state()
+    3. do_turn()
+    4. do_turn_relaxed()
+    5. do_turn_in_buffer()
+    6. in_buffer()
+    7. direction_to_point()
+    8. edit_parameters_after_doing_turn()
+    9. update_position()
+    10. draw() 
+
+    There are some problems that this architecture has with respect to our end goals, however.  
+
 
 ''' 
 
@@ -22,6 +45,7 @@ WINDOW_WIDTH = 800
 WINDOW_HEIGHT = 100
 WINDOW_BUFFER = 100
 MICE_NUMBER = 2
+WINDOW_BORDER_WIDTH = 5 
 
 #Defaul mouse behavior 
 
@@ -49,17 +73,44 @@ MOUSE_BEHAVIOR = dict(
 #"panic mode"... 
 
 
-def class Window: 
+def class Window:
+
+    mice = None 
+
     def __init__(self):
+        self.frame_rate = FRAME_RATE 
+        self.size_horizontal = WINDOW_WIDTH
+        self.size_vertical = WINDOW_HEIGHT 
+        self.size_buffer = WINDOW_BUFFER 
+        self.line_width_border = WINDOW_BORDER_WIDTH 
+        self.mice_number = MICE_NUMBER 
+
+        Window.mice = []
+        self.program_window = pygame.display.set_mode((self.size_horizontal, self.size_vertical)) 
+        self.clock = pygame.time.Clock()
+
+        self.create_mice() 
         pass 
 
     def create_mice(self):
+        for i in range(self.mice_number):
+            Window.mice.append(Mouse()) 
         pass
 
     def update_mice_movement(self): 
+        for mouse in Window.mice:
+            mouse.update_position()
+            if mouse.frame_number_current >= mouse.frame_number_end_of_turn:
+                mouse.do_turn()
+
+        self.clock.tick(FRAME_RATE) 
         pass 
 
-    def draw(self): 
+    def draw(self):
+        #pygame.draw.rect(self.program_window, self.size_buffer, self. --> working this kink 
+        for mouse in Window.mice:
+            mouse.draw()
+        pygame.display.flip() 
         pass 
 
 def class Mouse: 
@@ -209,13 +260,24 @@ def class Mouse:
         pass 
 
     def draw(self): 
-        pygame.draw.circle(
+        pygame.draw.circle(window.program_window, self.color, (round(self.position_horizontal), round(self.position_vertical)), \
+                self.radius, 0) 
         pass 
 
 if __name__ == "__main__":
+    pygame.init()
+    window = Window()
+    running = True 
+    while running: 
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                running = False 
+        window.update_animal_movement()
+        window.draw() 
 
 
 
+'''
 #creating pygame window (i.e, bounded region) 
 (width, height) = (300, 300) 
 window = pygame.display.set_mode((width, height)) 
@@ -227,4 +289,5 @@ while running:
         if event.type == pygame.QUIT: 
             running = False 
 #pygame.display.flip() 
+'''
 
