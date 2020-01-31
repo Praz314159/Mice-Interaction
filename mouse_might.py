@@ -161,13 +161,55 @@ def class Mouse:
         pass 
 
     def update_params_post_turn(self):
-        
+        self.direction_current = math.remainder(self.direction_durrent, 2*math.pi)
+        self.direction_end_of_turn = math.remained(self.direction_end_of_turn, 2*math.pi) 
+
+        if self.speed_current < self.speed_end_of_turn: 
+            self.is_accelerating = True 
+        else: 
+            self.is_accelerating = False 
+
+        if math.remainder(self.direction_current - self.direction_end_of_turn, 2*math.pi) < 0: 
+            self.is_turning_clockwise = True 
+        else: 
+            self.is_turning_clockwsie = False 
+
+        self.speed_change_per_frame = self.acceleration/FRAME_RATE
+        self.direction_change_per_frame = self.turn_speed/FRAME_RATE 
+        self.frame_number_end_of_turn = self.turn_time*FRAME_RATE 
+        self.frame_number_current = 0
         pass 
 
-    def update_pos(self): 
+    def update_pos(self):
+        if self.is_accelerating and self.speed_current < self.speed_end_of_turn: 
+            self.speed_current += self.speed_changer_per_frame
+        elif not self.is_accelerating and self.speed_current > self.speed_end_of_turn: 
+            self.speed_current -= self.speed_change_per_frame 
+
+        if self.is_turning_clockwise: 
+            if self.direction_end_of_turn > 0 and self.direction_current < self.direction_end_of_turn: 
+                self.direction_current += self.direction_change_per_frame
+            elif self.direction_end_of_turn < 0 and self.direction_current < self.direction_end_of_turn + math.pi*(\
+                    abs(self.direction_current) + self.direction_current)/abs(self.direction_current): 
+                self.direction_current += self.direction_change_per_frame 
+
+        else: 
+            if self.direction_end_of_turn < 0 and self.direction_current > self.direction_end_of_turn: 
+                self.direction_current -= self.direction_change_per_frame 
+            elif self.direction_end_of_turn > 0 and self.direction_current > self.direction_end_of_turn - abs(self.direciton_current)\
+                    -self.direction_current)/abs(self.direction_current): #bug here need to fix 
+                self.direction_current -= self.direction_change_per_frame 
+
+        #update horizontal pos
+        self.position_horizontal += math.cos(self.direction_current)*self.speed_current/FRAME_RATE
+        #update vertical pos 
+        self.position_vertical += math.sin(self.direction_current)*self.speed_current/FRAME_RATE
+        #increment frame count 
+        self.frame_number_current += 1 
         pass 
 
     def draw(self): 
+        pygame.draw.circle(
         pass 
 
 if __name__ == "__main__":
