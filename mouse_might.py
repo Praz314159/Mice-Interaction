@@ -52,7 +52,7 @@ import math
 
 FRAME_RATE = 30
 WINDOW_WIDTH = 800
-WINDOW_HEIGHT = 100
+WINDOW_HEIGHT = 800
 WINDOW_BUFFER = 100
 MICE_NUMBER = 2
 WINDOW_BORDER_WIDTH = 5 
@@ -60,20 +60,20 @@ WINDOW_BORDER_WIDTH = 5
 #Defaul mouse behavior 
 
 MOUSE_BEHAVIOR = dict(
-        SPEED_MIN = 0
-        SPEED_MAX =70
-        SPEED_CHANGE_MIN = 0
-        SPEED_CHANGE_MAX = 40
-        ACCELERATION_MIN =10
-        ACCELERATION_MAX = 100
-        TURN_ANGLE_MIN = 0.1*math.pi
-        TURN_ANGLE_MAX = 0..8*math.pi
-        TURN_SPEED_MIN = 1*math.pi
-        TURN_SPEED_MAX = 3*math.pi
-        TURN_TIME_MIN = 0.3
-        TURN_TIME_MAX = 0.6
-        TURN_ANGLE_TOLERANCE_BUFFER = 0.2*math.pi
-        COLOR = (108, 110, 107)
+        SPEED_MIN = 0,
+        SPEED_MAX = 70,
+        SPEED_CHANGE_MIN = 0,
+        SPEED_CHANGE_MAX = 40,
+        ACCELERATION_MIN =10,
+        ACCELERATION_MAX = 100,
+        TURN_ANGLE_MIN = 0.1*math.pi,
+        TURN_ANGLE_MAX = 0.8*math.pi,
+        TURN_SPEED_MIN = 1*math.pi,
+        TURN_SPEED_MAX = 3*math.pi,
+        TURN_TIME_MIN = 0.3,
+        TURN_TIME_MAX = 0.6,
+        TURN_ANGLE_TOLERANCE_BUFFER = 0.2*math.pi,
+        COLOR = (108, 110, 107),
         RADIUS = 10
 ) 
 
@@ -83,11 +83,11 @@ MOUSE_BEHAVIOR = dict(
 #"panic mode"... 
 
 
-def class Window:
+class Window:
 
     mice = None 
 
-    def __init__(self):
+    def __init__(self, mouse_behavior):
         self.frame_rate = FRAME_RATE 
         self.size_horizontal = WINDOW_WIDTH
         self.size_vertical = WINDOW_HEIGHT 
@@ -99,31 +99,31 @@ def class Window:
         self.program_window = pygame.display.set_mode((self.size_horizontal, self.size_vertical)) 
         self.clock = pygame.time.Clock()
 
-        self.create_mice() 
-        pass 
+        self.create_mice(mouse_behavior) 
+         
 
-    def create_mice(self):
+    def create_mice(self, mouse_behavior):
         for i in range(self.mice_number):
-            Window.mice.append(Mouse()) 
-        pass
+            Window.mice.append(Mouse(mouse_behavior)) 
+        
 
     def update_mice_movement(self): 
         for mouse in Window.mice:
-            mouse.update_position()
+            mouse.update_pos()
             if mouse.frame_number_current >= mouse.frame_number_end_of_turn:
                 mouse.do_turn()
 
         self.clock.tick(FRAME_RATE) 
-        pass 
+         
 
     def draw(self):
         #pygame.draw.rect(self.program_window, self.size_buffer, self. --> working this kink 
         for mouse in Window.mice:
             mouse.draw()
         pygame.display.flip() 
-        pass 
+         
 
-def class Mouse: 
+class Mouse: 
     def __init__(self, mouse_behavior):
         #general 
         self.speed_min = mouse_behavior["SPEED_MIN"] #min move speed of mouse (px/s)
@@ -134,11 +134,11 @@ def class Mouse:
         self.acceleration_max = mouse_behavior["ACCELERATION_MAX"] #max acceleration when changing speed (px/s^2) 
         self.turn_angle_min =  mouse_behavior["TURN_ANGLE_MIN"] #min dir change during turn (rad) 
         self.turn_angle_max = mouse_behavior["TURN_ANGLE_MAX"] #max dir change during turn (rad) 
-        self._turn_speed_min = mouse_behavior["TURN_SPEED_MIN"] #min angular velocity of dir change (rad/s) 
+        self.turn_speed_min = mouse_behavior["TURN_SPEED_MIN"] #min angular velocity of dir change (rad/s) 
         self.turn_speed_max = mouse_behavior["TURN_SPEED_MAX"] #max angular velocity of dir change (rad/s) 
         self.turn_time_min = mouse_behavior["TURN_TIME_MIN"] #min time to next turn (s) 
         self.turn_time_max = mouse_behavior["TURN_TIME_MAX"] #max time to next turn (s) 
-        self.turn_angle_to_tolerance_buffer = mouse_behavior["TURN_ANGLE_TOLERANCE_BUFFER"] #allowed dir dif to center of 
+        self.turn_angle_tolerance_buffer = mouse_behavior["TURN_ANGLE_TOLERANCE_BUFFER"] #allowed dir dif to center of 
         #window during return from buffer zone 
         self.color = mouse_behavior["COLOR"] #mouse color 
         self.radius = mouse_behavior["RADIUS"] #radius of circle that represents mouse 
@@ -166,7 +166,7 @@ def class Mouse:
         pass 
 
     def set_initial_state(self):
-        self.speed_current = rand.uniform(self.speed_min, self.speed_max)
+        self.speed_current = random.uniform(self.speed_min, self.speed_max)
         self.direction_current = random.uniform(-math.pi, math.pi) 
         self.position_horizontal = random.uniform(WINDOW_BUFFER, WINDOW_WIDTH - WINDOW_BUFFER) 
         self.position_vertical = random.uniform(WINDOW_BUFFER, WINDOW_HEIGHT - WINDOW_BUFFER) 
@@ -178,12 +178,12 @@ def class Mouse:
         else: 
             self.do_turn_relaxed() 
 
-        self.edit_parameters_after_doing_turn() #updating after turn 
+        self.update_params_post_turn() #updating after turn 
         pass 
 
     def do_turn_relaxed(self): 
         #randomly increase/decrease speed 
-        self.speed_end_of_turn = self.speed_current + random.choise([1,-1])*random.uniform(self.speed_change_min,\
+        self.speed_end_of_turn = self.speed_current + random.choice([1,-1])*random.uniform(self.speed_change_min,\
                 self.speed_change_max)
 
         if self.speed_end_of_turn > self.speed_max: 
@@ -196,12 +196,12 @@ def class Mouse:
                 self.turn_angle_max)
         self.acceleration = random.uniform(self.acceleration_min, self.acceleration_max) 
         self.turn_speed = random.uniform(self.turn_speed_min, self.turn_speed_max) 
-        self.turn_time = random_uniform(self.turn_time_min, self.turn_time_max) 
+        self.turn_time = random.uniform(self.turn_time_min, self.turn_time_max) 
         pass 
 
     def do_turn_in_buffer(self): 
         self.speed_end_of_turn = self.speed_max 
-        self.direction_end_of_turn = self.direction_to_point(HOUSE_WIDTH/2, HOUSE_HEIGHT/2) + random.uniform(\
+        self.direction_end_of_turn = self.direction_to_point(WINDOW_WIDTH/2, WINDOW_HEIGHT/2) + random.uniform(\
                 -self.turn_angle_tolerance_buffer, self.turn_angle_tolerance_buffer)
         self.acceleration = self.acceleration_max
         self.turn_speed = self.turn_speed_max
@@ -209,7 +209,7 @@ def class Mouse:
         pass 
 
     def in_buffer(self): 
-        if (self.position_horizontal < WINDOW_BUFFER or self.psoition_horizontal > WINDOW_WIDTH - WINDOW_BUFFER or \
+        if self.position_horizontal < WINDOW_BUFFER or self.position_horizontal > WINDOW_WIDTH - WINDOW_BUFFER or \
                 self.position_vertical < WINDOW_BUFFER or self.position_vertical > WINDOW_HEIGHT - WINDOW_BUFFER:
             return True 
         else: 
@@ -222,8 +222,8 @@ def class Mouse:
         pass 
 
     def update_params_post_turn(self):
-        self.direction_current = math.remainder(self.direction_durrent, 2*math.pi)
-        self.direction_end_of_turn = math.remained(self.direction_end_of_turn, 2*math.pi) 
+        self.direction_current = math.remainder(self.direction_current, 2*math.pi)
+        self.direction_end_of_turn = math.remainder(self.direction_end_of_turn, 2*math.pi) 
 
         if self.speed_current < self.speed_end_of_turn: 
             self.is_accelerating = True 
@@ -243,7 +243,7 @@ def class Mouse:
 
     def update_pos(self):
         if self.is_accelerating and self.speed_current < self.speed_end_of_turn: 
-            self.speed_current += self.speed_changer_per_frame
+            self.speed_current += self.speed_change_per_frame
         elif not self.is_accelerating and self.speed_current > self.speed_end_of_turn: 
             self.speed_current -= self.speed_change_per_frame 
 
@@ -257,8 +257,8 @@ def class Mouse:
         else: 
             if self.direction_end_of_turn < 0 and self.direction_current > self.direction_end_of_turn: 
                 self.direction_current -= self.direction_change_per_frame 
-            elif self.direction_end_of_turn > 0 and self.direction_current > self.direction_end_of_turn - abs(self.direciton_current)\
-                    -self.direction_current)/abs(self.direction_current): #bug here need to fix 
+            elif self.direction_end_of_turn > 0 and self.direction_current > self.direction_end_of_turn - \
+                    math.pi * (abs(self.direction_current)-self.direction_current)/abs(self.direction_current): 
                 self.direction_current -= self.direction_change_per_frame 
 
         #update horizontal pos
@@ -270,19 +270,17 @@ def class Mouse:
         pass 
 
     def draw(self): 
-        pygame.draw.circle(window.program_window, self.color, (round(self.position_horizontal), round(self.position_vertical)), \
-                self.radius, 0) 
-        pass 
+        pygame.draw.circle(window.program_window, self.color, (round(self.position_horizontal), round(self.position_vertical)), self.radius, 0)
 
 if __name__ == "__main__":
     pygame.init()
-    window = Window()
+    window = Window(MOUSE_BEHAVIOR)
     running = True 
     while running: 
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 running = False 
-        window.update_animal_movement()
+        window.update_mice_movement()
         window.draw() 
 
 
