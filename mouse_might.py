@@ -105,6 +105,8 @@ class Window:
     def create_mice(self, mouse_behavior):
         for i in range(self.mice_number):
             Window.mice.append(Mouse(mouse_behavior)) 
+
+        Window.mice[0].color = (75, 139, 190) 
         
 
     def update_mice_movement(self): 
@@ -283,19 +285,4 @@ if __name__ == "__main__":
         window.update_mice_movement()
         window.draw() 
 
-
-
-'''
-#creating pygame window (i.e, bounded region) 
-(width, height) = (300, 300) 
-window = pygame.display.set_mode((width, height)) 
-
-#closing window at user discretion 
-running = True 
-while running: 
-    for event in pygame.event.get(): 
-        if event.type == pygame.QUIT: 
-            running = False 
-#pygame.display.flip() 
-'''
 
